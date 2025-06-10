@@ -1,3 +1,4 @@
+
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,44 +8,49 @@ import Image from 'next/image';
 
 const features = [
   {
-    title: 'AI Profile Creation',
-    description: 'Craft a compelling LinkedIn profile in Japanese and English with AI assistance.',
+    title: 'AI プロフィール作成',
+    description: 'AIが日本語と英語で魅力的なLinkedInプロフィールを作成します。',
     icon: UserSquare,
     href: '/profile',
     image: 'https://placehold.co/600x400.png',
     aiHint: 'professional portrait',
+    buttonText: 'プロフィール作成へ',
   },
   {
-    title: 'AI Post Forge',
-    description: 'Generate engaging long-form LinkedIn posts in Japanese and English.',
+    title: 'AI 投稿作成アシスト',
+    description: '日本語と英語でエンゲージメントの高いLinkedIn投稿を生成します。',
     icon: PenSquare,
     href: '/posts',
     image: 'https://placehold.co/600x400.png',
     aiHint: 'writing content',
+    buttonText: '投稿作成アシストへ',
   },
   {
-    title: 'AI Comment Assist',
-    description: 'Get AI-suggested comments for LinkedIn posts in Japanese and English.',
+    title: 'AI コメントアシスト',
+    description: 'LinkedIn投稿への日本語と英語のコメント案をAIが提案します。',
     icon: MessageSquarePlus,
     href: '/comments',
     image: 'https://placehold.co/600x400.png',
     aiHint: 'social media interaction',
+    buttonText: 'コメントアシストへ',
   },
   {
-    title: 'Lead Finder',
-    description: 'Discover relevant leads based on your criteria and access contact information.',
+    title: 'リードファインダー',
+    description: '基準に基づいて関連性の高いリードを見つけ、連絡先情報にアクセスします。',
     icon: Users,
     href: '/leads',
     image: 'https://placehold.co/600x400.png',
     aiHint: 'networking business',
+    buttonText: 'リードファインダーへ',
   },
   {
-    title: 'Trend Watcher',
-    description: 'Stay updated with the latest relevant posts and comments for Japanese CEOs.',
+    title: 'トレンドウォッチャー',
+    description: '日本人CEO向けの最新の関連投稿やコメントを把握し、時流を捉えます。',
     icon: TrendingUp,
     href: '/trends',
     image: 'https://placehold.co/600x400.png',
     aiHint: 'market trends',
+    buttonText: 'トレンドウォッチャーへ',
   },
 ];
 
@@ -53,9 +59,9 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="flex flex-col gap-8">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Welcome to Globalink CEO</h1>
+          <h1 className="text-3xl font-bold tracking-tight font-headline">Globalink CEO へようこそ</h1>
           <p className="text-muted-foreground">
-            Your AI-powered assistant for mastering LinkedIn and expanding your global reach.
+            LinkedInを最大限に活用し、グローバルなリーチを拡大するためのAI搭載アシスタントです。
           </p>
         </header>
 
@@ -63,11 +69,11 @@ export default function DashboardPage() {
           {features.map((feature) => (
             <Card key={feature.title} className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="relative h-48 w-full">
-                <Image 
-                  src={feature.image} 
-                  alt={feature.title} 
-                  layout="fill" 
-                  objectFit="cover" 
+                <Image
+                  src={feature.image}
+                  alt={feature.title}
+                  fill // layout="fill" is deprecated, use fill
+                  objectFit="cover"
                   data-ai-hint={feature.aiHint}
                 />
               </div>
@@ -83,7 +89,7 @@ export default function DashboardPage() {
               <div className="p-6 pt-0">
                 <Button asChild variant="default" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                   <Link href={feature.href}>
-                    Go to {feature.title.replace("AI ", "")} <ArrowRight className="ml-2 h-4 w-4" />
+                    {feature.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>

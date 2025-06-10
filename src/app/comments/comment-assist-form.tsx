@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,8 +22,8 @@ import { Loader2, Copy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const commentAssistFormSchema = z.object({
-  postContent: z.string().min(20, { message: "Post content must be at least 20 characters." }).max(2000, { message: "Post content must be at most 2000 characters."}),
-  ceoProfile: z.string().min(10, { message: "CEO profile summary must be at least 10 characters." }).max(500, {message: "CEO profile summary must be at most 500 characters."}),
+  postContent: z.string().min(20, { message: "投稿内容は20文字以上で入力してください。" }).max(2000, { message: "投稿内容は2000文字以内で入力してください。"}),
+  ceoProfile: z.string().min(10, { message: "CEOのプロフィール概要は10文字以上で入力してください。" }).max(500, {message: "CEOのプロフィール概要は500文字以内で入力してください。"}),
 });
 
 type CommentAssistFormValues = z.infer<typeof commentAssistFormSchema>;
@@ -47,14 +48,14 @@ export default function CommentAssistForm() {
       const result = await generateSuggestedResponses(data as SuggestedResponsesInput);
       setSuggestedComments(result);
       toast({
-        title: "Comments Suggested",
-        description: "AI has generated comment suggestions for you.",
+        title: "コメント案が生成されました",
+        description: "AIがコメントの提案を作成しました。",
       });
     } catch (error) {
       console.error("Error generating comments:", error);
       toast({
-        title: "Error",
-        description: "Failed to generate comments. Please try again.",
+        title: "エラー",
+        description: "コメントの生成に失敗しました。もう一度お試しください。",
         variant: "destructive",
       });
     }
@@ -63,9 +64,9 @@ export default function CommentAssistForm() {
 
   const copyToClipboard = (text: string, language: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      toast({ title: `${language} comment copied to clipboard!` });
+      toast({ title: `${language === 'Japanese' ? '日本語' : '英語'}のコメントをクリップボードにコピーしました！` });
     }).catch(err => {
-      toast({ title: `Failed to copy ${language} comment.`, variant: "destructive" });
+      toast({ title: `コメントのコピーに失敗しました。`, variant: "destructive" });
       console.error('Failed to copy text: ', err);
     });
   };
@@ -79,15 +80,15 @@ export default function CommentAssistForm() {
             name="postContent"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>LinkedIn Post Content</FormLabel>
+                <FormLabel>LinkedIn投稿の内容</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Paste the content of the LinkedIn post here..."
+                    placeholder="ここにLinkedIn投稿の本文を貼り付けてください..."
                     className="resize-y min-h-[150px]"
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>The content of the post you want to comment on.</FormDescription>
+                <FormDescription>コメントしたい投稿の本文です。</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -97,15 +98,15 @@ export default function CommentAssistForm() {
             name="ceoProfile"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Brief CEO Profile/Perspective</FormLabel>
+                <FormLabel>CEOの簡単なプロフィール／視点</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Briefly describe the CEO's expertise or the perspective they should comment from (e.g., 'Expert in renewable energy, focusing on sustainable solutions')."
+                    placeholder="CEOの専門分野やコメントする際の視点を簡潔に記述してください（例：「再生可能エネルギーの専門家、持続可能なソリューションに注力」）。"
                     className="resize-y min-h-[100px]"
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>This helps the AI tailor the comment effectively.</FormDescription>
+                <FormDescription>AIがコメントを効果的に調整するのに役立ちます。</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -114,10 +115,10 @@ export default function CommentAssistForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating Comments...
+                コメント生成中...
               </>
             ) : (
-              "Suggest Comments"
+              "コメントを提案する"
             )}
           </Button>
         </form>
@@ -125,11 +126,11 @@ export default function CommentAssistForm() {
 
       {suggestedComments && (
         <div className="mt-12 space-y-8">
-          <h2 className="text-2xl font-semibold text-center font-headline">Suggested Comments</h2>
+          <h2 className="text-2xl font-semibold text-center font-headline">提案されたコメント</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="shadow-lg">
                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xl font-headline">English Comment</CardTitle>
+                <CardTitle className="text-xl font-headline">英語のコメント (English Comment)</CardTitle>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(suggestedComments.englishComment, "English")}>
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -140,7 +141,7 @@ export default function CommentAssistForm() {
             </Card>
             <Card className="shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xl font-headline">Japanese Comment (日本語コメント)</CardTitle>
+                <CardTitle className="text-xl font-headline">日本語のコメント</CardTitle>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(suggestedComments.japaneseComment, "Japanese")}>
                   <Copy className="h-4 w-4" />
                 </Button>

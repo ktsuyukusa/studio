@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,14 +30,22 @@ import { Loader2, Copy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const postForgeFormSchema = z.object({
-  topic: z.string().min(5, { message: "Topic must be at least 5 characters." }).max(100, {message: "Topic must be at most 100 characters."}),
-  keywords: z.string().min(3, { message: "Keywords must be at least 3 characters." }).max(150, {message: "Keywords must be at most 150 characters."}),
-  tone: z.string({ required_error: "Please select a tone." }),
+  topic: z.string().min(3, { message: "トピックは3文字以上で入力してください。" }).max(100, {message: "トピックは100文字以内で入力してください。"}),
+  keywords: z.string().min(2, { message: "キーワードは2文字以上で入力してください。" }).max(150, {message: "キーワードは150文字以内で入力してください。"}),
+  tone: z.string({ required_error: "希望のトーンを選択してください。" }),
 });
 
 type PostForgeFormValues = z.infer<typeof postForgeFormSchema>;
 
-const tones = ["professional", "friendly", "authoritative", "inspirational", "informative"];
+const tones = [
+  { value: "professional", label: "プロフェッショナル (Professional)" },
+  { value: "friendly", label: "フレンドリー (Friendly)" },
+  { value: "authoritative", label: "権威的 (Authoritative)" },
+  { value: "inspirational", label: "インスピレーショナル (Inspirational)" },
+  { value: "informative", label: "情報提供型 (Informative)" },
+  { value: "thought-provoking", label: "示唆に富む (Thought-provoking)" },
+];
+
 
 export default function PostForgeForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -59,14 +68,14 @@ export default function PostForgeForm() {
       const result = await generatePost(data as GeneratePostInput);
       setGeneratedPosts(result);
       toast({
-        title: "Posts Generated",
-        description: "Your LinkedIn posts have been successfully generated.",
+        title: "投稿が生成されました",
+        description: "LinkedIn用の投稿が正常に作成されました。",
       });
     } catch (error) {
       console.error("Error generating posts:", error);
       toast({
-        title: "Error",
-        description: "Failed to generate posts. Please try again.",
+        title: "エラー",
+        description: "投稿の生成に失敗しました。もう一度お試しください。",
         variant: "destructive",
       });
     }
@@ -75,9 +84,9 @@ export default function PostForgeForm() {
 
   const copyToClipboard = (text: string, language: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      toast({ title: `${language} post copied to clipboard!` });
+      toast({ title: `${language === 'Japanese' ? '日本語' : '英語'}の投稿をクリップボードにコピーしました！` });
     }).catch(err => {
-      toast({ title: `Failed to copy ${language} post.`, variant: "destructive" });
+      toast({ title: `投稿のコピーに失敗しました。`, variant: "destructive" });
       console.error('Failed to copy text: ', err);
     });
   };
@@ -91,11 +100,11 @@ export default function PostForgeForm() {
             name="topic"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Post Topic</FormLabel>
+                <FormLabel>投稿のトピック</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., The Future of AI in Global Business" {...field} />
+                  <Input placeholder="例：グローバルビジネスにおけるAIの未来" {...field} />
                 </FormControl>
-                <FormDescription>What is the main subject of your post?</FormDescription>
+                <FormDescription>投稿の主なテーマは何ですか？</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -105,11 +114,11 @@ export default function PostForgeForm() {
             name="keywords"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Keywords</FormLabel>
+                <FormLabel>キーワード</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., artificial intelligence, international trade, innovation" {...field} />
+                  <Input placeholder="例：人工知能, 国際貿易, イノベーション" {...field} />
                 </FormControl>
-                <FormDescription>Relevant keywords to include, separated by commas.</FormDescription>
+                <FormDescription>投稿に含めたい関連キーワードをカンマ区切りで入力してください。</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -119,22 +128,22 @@ export default function PostForgeForm() {
             name="tone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tone of Voice</FormLabel>
+                <FormLabel>希望のトーン</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a tone" />
+                      <SelectValue placeholder="トーンを選択" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {tones.map((tone) => (
-                      <SelectItem key={tone} value={tone} className="capitalize">
-                        {tone.charAt(0).toUpperCase() + tone.slice(1)}
+                      <SelectItem key={tone.value} value={tone.value}>
+                        {tone.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>Choose the desired tone for your post.</FormDescription>
+                <FormDescription>投稿に希望する文体を選択してください。</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -143,10 +152,10 @@ export default function PostForgeForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating Posts...
+                投稿を生成中...
               </>
             ) : (
-              "Generate Posts"
+              "投稿を生成する"
             )}
           </Button>
         </form>
@@ -154,11 +163,11 @@ export default function PostForgeForm() {
 
       {generatedPosts && (
         <div className="mt-12 space-y-8">
-          <h2 className="text-2xl font-semibold text-center font-headline">Generated Posts</h2>
+          <h2 className="text-2xl font-semibold text-center font-headline">生成された投稿</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xl font-headline">Japanese Post (日本語投稿)</CardTitle>
+                <CardTitle className="text-xl font-headline">日本語の投稿</CardTitle>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(generatedPosts.japanesePost, "Japanese")}>
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -169,7 +178,7 @@ export default function PostForgeForm() {
             </Card>
             <Card className="shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xl font-headline">English Post</CardTitle>
+                <CardTitle className="text-xl font-headline">英語の投稿 (English Post)</CardTitle>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(generatedPosts.englishPost, "English")}>
                   <Copy className="h-4 w-4" />
                 </Button>
