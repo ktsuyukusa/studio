@@ -13,7 +13,7 @@ const features = [
     icon: UserSquare,
     href: '/profile',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'professional portrait',
+    aiHint: 'linkedin profile',
     buttonText: 'プロフィール作成へ',
   },
   {
@@ -22,7 +22,7 @@ const features = [
     icon: PenSquare,
     href: '/posts',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'writing content',
+    aiHint: 'content creation',
     buttonText: '投稿作成アシストへ',
   },
   {
@@ -31,7 +31,7 @@ const features = [
     icon: MessageSquarePlus,
     href: '/comments',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'social media interaction',
+    aiHint: 'social engagement',
     buttonText: 'コメントアシストへ',
   },
   {
@@ -40,7 +40,7 @@ const features = [
     icon: Users,
     href: '/leads',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'networking business',
+    aiHint: 'lead generation',
     buttonText: 'リードファインダーへ',
   },
   {
@@ -49,7 +49,7 @@ const features = [
     icon: TrendingUp,
     href: '/trends',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'market trends',
+    aiHint: 'trend analysis',
     buttonText: 'トレンドウォッチャーへ',
   },
 ];
@@ -72,8 +72,8 @@ export default function DashboardPage() {
                 <Image
                   src={feature.image}
                   alt={feature.title}
-                  fill // layout="fill" is deprecated, use fill
-                  objectFit="cover"
+                  fill
+                  className="object-cover"
                   data-ai-hint={feature.aiHint}
                 />
               </div>
