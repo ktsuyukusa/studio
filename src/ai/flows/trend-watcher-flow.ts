@@ -19,14 +19,14 @@ export type TrendWatcherInput = z.infer<typeof TrendWatcherInputSchema>;
 const TrendPostSchema = z.object({
   id: z.string().describe('A unique identifier for the trend post.'),
   author: z.string().describe('The hypothetical author of the post (e.g., "業界アナリスト", "大手企業CEO").'),
-  authorAvatar: z.string().url().describe("A placeholder image URL for the author's avatar. Use https://placehold.co/80x80.png."),
+  authorAvatar: z.string().describe("A placeholder image URL for the author's avatar. Use https://placehold.co/80x80.png."),
   authorAvatarHint: z.string().describe("A data-ai-hint for the author's avatar, e.g., 'professional portrait' or 'business person'."),
   contentSnippet: z.string().describe('A concise summary of the trending post or discussion topic. Max 2-3 sentences.'),
   likes: z.number().int().min(0).describe('A plausible number of likes for such a post.'),
   comments: z.number().int().min(0).describe('A plausible number of comments.'),
   reposts: z.number().int().min(0).describe('A plausible number of reposts or shares.'),
-  postUrl: z.string().url().describe('A sample URL representing where such a discussion might occur (e.g., a link to a relevant news category, or a search query like https://www.google.com/search?q=キーワード).'),
-  imageUrl: z.string().url().optional().describe("If the post likely contains an image, provide a placeholder image URL (e.g., https://placehold.co/600x300.png)."),
+  postUrl: z.string().describe('A sample URL representing where such a discussion might occur (e.g., a link to a relevant news category, or a search query like https://www.google.com/search?q=キーワード).'),
+  imageUrl: z.string().optional().describe("If the post likely contains an image, provide a placeholder image URL (e.g., https://placehold.co/600x300.png)."),
   imageHint: z.string().optional().describe("If an imageUrl is provided, add a data-ai-hint for it, e.g., 'business graph' or 'team collaboration'."),
 });
 
