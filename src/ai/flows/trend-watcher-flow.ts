@@ -70,16 +70,32 @@ const trendWatcherFlow = ai.defineFlow(
     inputSchema: TrendWatcherInputSchema,
     outputSchema: TrendWatcherOutputSchema,
   },
-  async (input: TrendWatcherInput) => {
+  async (input: TrendWatcherInput): Promise<TrendWatcherOutput> => {
     const {output} = await trendWatcherPrompt(input);
-    if (!output) {
+
+    if (!output || !output.analyzedTrends || !Array.isArray(output.analyzedTrends)) {
       return { analyzedTrends: [] };
     }
-    return {
-      analyzedTrends: output.analyzedTrends.map((trend, index) => ({
-        ...trend,
-        id: trend.id || `trend-${Date.now()}-${index}`, 
-      })),
-    };
+
+    const validatedTrends = output.analyzedTrends.map((trend, index) => {
+      // Ensure trend is an object before spreading, though Zod schema should enforce this for items in the array.
+      const currentTrend = typeof trend === 'object' && trend !== null ? trend : {};
+      return {
+        id: currentTrend.id || `trend-${Date.now()}-${index}`,
+        trendTitle: currentTrend.trendTitle || '',
+        keyTrendPoints: Array.isArray(currentTrend.keyTrendPoints) ? currentTrend.keyTrendPoints : [],
+        trendAnalysis: currentTrend.trendAnalysis || '',
+        potentialNextSteps: currentTrend.potentialNextSteps && Array.isArray(currentTrend.potentialNextSteps) ? currentTrend.potentialNextSteps : undefined,
+        sampleSearchQuery: currentTrend.sampleSearchQuery || '',
+        imageUrl: currentTrend.imageUrl, // Optional, so pass through
+        imageHint: currentTrend.imageHint, // Optional, so pass through
+        // Spread other properties from currentTrend if TrendAnalysisSchema has more than listed here
+        ...currentTrend,
+      } as TrendAnalysis; // Assert as TrendAnalysis after defaults
+    });
+
+    return { analyzedTrends: validatedTrends };
   }
 );
+
+    
