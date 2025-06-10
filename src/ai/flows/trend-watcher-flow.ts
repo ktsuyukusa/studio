@@ -1,9 +1,9 @@
 
 'use server';
 /**
- * @fileOverview A flow for generating insights on trending LinkedIn topics for Japanese CEOs.
+ * @fileOverview A flow for generating insights on business trends relevant to Japanese CEOs.
  *
- * - generateTrendingTopics - A function that generates trending topic examples.
+ * - generateTrendingTopics - A function that generates analyzed trend information.
  * - TrendWatcherInput - The input type for the generateTrendingTopics function.
  * - TrendWatcherOutput - The return type for the generateTrendingTopics function.
  */
@@ -12,26 +12,24 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const TrendWatcherInputSchema = z.object({
-  keywords: z.string().describe('Keywords or topics to search for trends (e.g., "デジタルトランスフォーメーション 日本", "サステナビリティ経営").'),
+  keywords: z.string().describe('Keywords or topics to analyze for trends (e.g., "日本酒 欧州市場", "GX戦略 日本企業").'),
 });
 export type TrendWatcherInput = z.infer<typeof TrendWatcherInputSchema>;
 
-const TrendPostSchema = z.object({
-  id: z.string().describe('A unique identifier for the trend post.'),
-  author: z.string().describe('このトレンドを観察または報告している可能性のある情報源や人物の仮名または役職（例：「市場調査アナリスト」「業界レポート」など、キーワードに関連性の高いものが望ましい）'),
-  authorAvatar: z.string().describe("A placeholder image URL for the author's avatar. Use https://placehold.co/80x80.png."),
-  authorAvatarHint: z.string().describe("A data-ai-hint for the author's avatar, e.g., 'professional portrait' or 'business person'."),
-  contentSnippet: z.string().describe('キーワードに関連して観察される具体的なトレンドや議論の主要なポイントを記述してください。これは、市場の動き、消費者行動の変化、技術の採用、規制の動向、業界内の共通認識など、注目すべきパターンや変化点です。例えば、「欧州市場では日本酒のプレミアム化が進んでおり、特に少量生産のクラフト酒への関心が高まっている」や「日本酒の輸出において、SNSを活用したD2Cマーケティングの成功事例が増加傾向にある」といった形式で記述してください。Max 2-3 sentences.'),
-  likes: z.number().int().min(0).describe('A plausible number of likes for such a post/trend observation.'),
-  comments: z.number().int().min(0).describe('A plausible number of comments related to this trend observation.'),
-  reposts: z.number().int().min(0).describe('A plausible number of reposts or shares of this trend observation.'),
-  postUrl: z.string().describe('このトレンドに関する追加情報や議論がなされる可能性のある場所を示すサンプルURL（例：関連ニュースカテゴリへのリンクや、google.comでの「キーワード」に関する検索クエリURLなど https://www.google.com/search?q={{{keywords}}}）。'),
-  imageUrl: z.string().optional().describe("If the trend or discussion likely has an associated visual, provide a placeholder image URL (e.g., https://placehold.co/600x300.png)."),
-  imageHint: z.string().optional().describe("If an imageUrl is provided, add a data-ai-hint for it, e.g., 'business graph' or 'team collaboration', relevant to the '{{{keywords}}}'."),
+const TrendAnalysisSchema = z.object({
+  id: z.string().describe('A unique identifier for the trend analysis item.'),
+  trendTitle: z.string().describe('このトレンドを簡潔に表す日本語のタイトル。'),
+  keyTrendPoints: z.array(z.string()).describe('トレンドの主要なポイントを日本語の箇条書きで。3～5点。'),
+  trendAnalysis: z.string().describe('このトレンドが日本のCEOにとって何を意味するのか、日本語での簡単な分析や考察。2～3文程度。'),
+  potentialNextSteps: z.array(z.string()).optional().describe('このトレンドを踏まえ、CEOが検討しうる具体的な次のステップや情報収集の提案を日本語で。AIが生成。例：「欧州市場に特化した食品展示会への参加を検討」「現地の日本食レストランチェーンとの提携可能性を調査」'),
+  sampleSearchQuery: z.string().describe('このトレンドに関する追加情報を検索するためのGoogle検索クエリ例（日本語または英語）。URLエンコードは不要。例: "日本酒 欧州市場 規制"'),
+  imageUrl: z.string().optional().describe("トレンド分析に関連する視覚情報があればプレースホルダー画像URL (https://placehold.co/600x300.png を使用)。"),
+  imageHint: z.string().optional().describe("imageUrlを提供する場合、その画像のdata-ai-hint (例: '市場分析グラフ', '欧州地図 日本酒')、キーワード「{{{keywords}}}」と関連性のあるもの。"),
 });
+export type TrendAnalysis = z.infer<typeof TrendAnalysisSchema>;
 
 const TrendWatcherOutputSchema = z.object({
-  trends: z.array(TrendPostSchema).describe('A list of 3-5 analyzed trends or significant discussion points based on the keywords.'),
+  analyzedTrends: z.array(TrendAnalysisSchema).describe('A list of 3-4 analyzed business trends based on the keywords.'),
 });
 export type TrendWatcherOutput = z.infer<typeof TrendWatcherOutputSchema>;
 
@@ -43,28 +41,24 @@ const trendWatcherPrompt = ai.definePrompt({
   name: 'trendWatcherPrompt',
   input: {schema: TrendWatcherInputSchema},
   output: {schema: TrendWatcherOutputSchema},
-  prompt: `あなたは、日本のCEO向けにLinkedIn上の最新ビジネストレンドを分析・特定し、要約する専門家です。
-あなたの主な任務は、提供された「キーワード」に**直接関連する**、現在LinkedIn上で注目されている可能性のある**具体的なトレンドの分析結果または注目すべき議論のポイント**を3～5件、CEOが理解しやすい形で生成することです。
+  prompt: `あなたは、日本のCEOがグローバル市場、特に指定された「キーワード」に関連するビジネストレンドを理解するのを支援する、シニア・ビジネスアナリストです。
+あなたの主な任務は、提供された「キーワード」に基づいて、現在注目すべきビジネス上の**具体的なトレンド分析結果**を3～4件、CEOが行動を起こすための洞察と共に生成することです。
 
 キーワード: {{{keywords}}}
 
-**最重要指示:** 生成されるすべてのトレンド項目（特に\`contentSnippet\`）は、上記「キーワード」に密接に関連していなければなりません。一般的なビジネストピックではなく、**キーワードに特化した内容**を優先してください。
+各トレンド分析結果には、以下の情報を必ず含めてください：
+- id: ユニークなID（例: "trend-analysis-1"）。
+- trendTitle: このトレンドを簡潔に表す日本語のタイトル。
+- keyTrendPoints: このトレンドの主要なポイントを日本語の箇条書きで3～5点。各ポイントは具体的で理解しやすいものにしてください。
+- trendAnalysis: このトレンドが、キーワード「{{{keywords}}}」に関心を持つ日本のCEOにとって何を意味するのか、どのような影響があるのか、簡単な日本語の分析や考察を2～3文で記述してください。
+- potentialNextSteps: (任意) このトレンドを踏まえ、CEOが検討しうる具体的な次のステップや情報収集の提案を日本語で1～2点挙げてください。AIが生成するものであり、実在の企業リスト等を保証するものではありません。例えば、「{{{keywords}}} に関連する欧州の主要な業界展示会への参加を検討する」「{{{keywords}}} 分野の専門家やコンサルタントに意見を求める」といった内容です。もし具体的な提案が困難な場合は、この項目は省略しても構いません。
+- sampleSearchQuery: このトレンドに関する追加情報をGoogleで検索するための、効果的な検索クエリ例（日本語または英語）を提示してください。URLエンコードは不要です。例: "日本酒 欧州市場 最新トレンド" や "EU food import regulations sake" など。
+- imageUrl: トレンド分析を視覚的に補足する画像が必要な場合は、プレースホルダー画像URL (https://placehold.co/600x300.png を使用)。画像は「{{{keywords}}}」と関連性が高いものにしてください。
+- imageHint: imageUrlを提供する場合、その画像のdata-ai-hint。キーワード「{{{keywords}}}」に関連性の高いものを2単語以内で指定してください (例: '日本酒 輸出データ', '欧州規制 資料')。
 
-各トレンド項目には、以下の情報を含めてください：
-- id: ユニークなID（例: "trend-1"）
-- author: このトレンドを**観察または報告している**可能性のある情報源や人物の仮名または役職（例：「市場調査アナリスト」「業界レポート」など、キーワードに関連性の高いものが望ましい）
-- authorAvatar: 著者のアバター用のプレースホルダー画像URL (https://placehold.co/80x80.png を使用)
-- authorAvatarHint: 著者のアバターのdata-ai-hint (例: 'analyst photo', '{{{keywords}}} expert')
-- contentSnippet: **キーワードに関連して観察される具体的なトレンドや議論の主要なポイントを記述してください。** これは、市場の動き、消費者行動の変化、技術の採用、規制の動向、業界内の共通認識など、注目すべきパターンや変化点です。例えば、「欧州市場では日本酒のプレミアム化が進んでおり、特に少量生産のクラフト酒への関心が高まっている」や「日本酒の輸出において、SNSを活用したD2Cマーケティングの成功事例が増加傾向にある」といった形式で記述してください。Max 2-3 sentences.
-- likes: このトレンド観測に対して、もっともらしい「いいね！」の数。
-- comments: このトレンド観測に関連する、もっともらしいコメント数。
-- reposts: このトレンド観測の、もっともらしい再投稿数。
-- postUrl: このトレンドに関する追加情報や議論がなされる可能性のある場所を示すサンプルURL（例：関連ニュースカテゴリへのリンクや、google.comでの「キーワード」に関する検索クエリURLなど https://www.google.com/search?q={{{keywords}}}）。
-- imageUrl: トレンドや議論にキーワードと関連性の高い視覚情報が含まれそうな場合は、プレースホルダー画像URL (https://placehold.co/600x300.png を使用)。
-- imageHint: imageUrlを提供する場合、その画像のdata-ai-hint (例: 'sake market analysis graph', 'european trade data', '{{{keywords}}}')
-
-生成される内容は、日本のCEOが提供された「キーワード」について関心を持つであろう具体的なトレンド分析や議論のポイントでなければなりません。
-author名は日本語、または日本のビジネスシーンで一般的な英語表記にしてください。
+生成される内容は、LinkedInの投稿のような形式ではなく、純粋なビジネス分析レポートの形式で、客観的かつ洞察に富んだものでなければなりません。
+「LinkedIn上の注目トピック」のような文言は使用しないでください。
+CEOが迅速に状況を把握し、次の行動を検討できるような、具体的で実用的な情報提供を心がけてください。
 
 最終的なアウトプットは、指定されたJSONスキーマに従ってください。
 `,
@@ -79,15 +73,13 @@ const trendWatcherFlow = ai.defineFlow(
   async (input: TrendWatcherInput) => {
     const {output} = await trendWatcherPrompt(input);
     if (!output) {
-      return { trends: [] };
+      return { analyzedTrends: [] };
     }
     return {
-      trends: output.trends.map((trend, index) => ({
+      analyzedTrends: output.analyzedTrends.map((trend, index) => ({
         ...trend,
-        id: trend.id || `trend-${Date.now()}-${index}`, // Ensure ID exists
-        authorAvatar: trend.authorAvatar || 'https://placehold.co/80x80.png', // Ensure avatar exists
+        id: trend.id || `trend-${Date.now()}-${index}`, 
       })),
     };
   }
 );
-
