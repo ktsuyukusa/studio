@@ -1,3 +1,4 @@
+
 "use client";
 
 import AppLayout from '@/components/layout/app-layout';
@@ -5,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, Search, MessageCircle, Heart, Repeat, UserCircle } from 'lucide-react';
+import { TrendingUp, Search, MessageCircle, Heart, Repeat } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 
 interface TrendPost {
@@ -22,9 +24,9 @@ interface TrendPost {
 }
 
 const dummyTrends: TrendPost[] = [
-  { id: '1', author: 'Global Innovator', authorAvatar: 'https://placehold.co/80x80.png', contentSnippet: 'Exciting developments in sustainable energy for Asia! Our latest report highlights key market opportunities and challenges for CEOs looking to expand...', imageUrl: 'https://placehold.co/600x300.png', likes: 125, comments: 15, reposts: 30, postUrl: '#' },
-  { id: '2', author: 'Tech Visionary CEO', authorAvatar: 'https://placehold.co/80x80.png', contentSnippet: 'The impact of AI on traditional industries in Japan is undeniable. We must adapt and innovate to stay competitive. What are your thoughts?', likes: 230, comments: 45, reposts: 60, postUrl: '#' },
-  { id: '3', author: 'Economic Analyst JP', authorAvatar: 'https://placehold.co/80x80.png', contentSnippet: 'A deep dive into the Q3 economic outlook for Japanese businesses. Key sectors to watch include advanced manufacturing and green tech.', imageUrl: 'https://placehold.co/600x300.png', likes: 88, comments: 12, reposts: 20, postUrl: '#' },
+  { id: '1', author: 'Global Innovator', authorAvatar: 'https://placehold.co/80x80.png', contentSnippet: 'アジアにおける持続可能エネルギーのエキサイティングな発展！最新レポートでは、拡大を目指すCEOにとっての主要な市場機会と課題を強調しています...', imageUrl: 'https://placehold.co/600x300.png', likes: 125, comments: 15, reposts: 30, postUrl: '#' },
+  { id: '2', author: 'Tech Visionary CEO', authorAvatar: 'https://placehold.co/80x80.png', contentSnippet: '日本における伝統産業へのAIの影響は否定できません。競争力を維持するためには、適応し革新する必要があります。あなたの考えは？', likes: 230, comments: 45, reposts: 60, postUrl: '#' },
+  { id: '3', author: 'Economic Analyst JP', authorAvatar: 'https://placehold.co/80x80.png', contentSnippet: '日本企業の第3四半期経済見通しを深掘り。注目すべき主要セクターには、先端製造業やグリーンテクノロジーが含まれます。', imageUrl: 'https://placehold.co/600x300.png', likes: 88, comments: 12, reposts: 20, postUrl: '#' },
 ];
 
 export default function TrendWatcherPage() {
@@ -48,37 +50,37 @@ export default function TrendWatcherPage() {
           <CardHeader className="bg-muted/30 p-6">
             <div className="flex items-center gap-3 mb-2">
               <TrendingUp className="h-8 w-8 text-primary" />
-              <CardTitle className="text-2xl font-headline">Trend Watcher</CardTitle>
+              <CardTitle className="text-2xl font-headline">トレンドウォッチャー</CardTitle>
             </div>
             <CardDescription className="text-md">
-              Identify recent relevant posts and comments for Japanese CEOs to stay ahead of the curve.
+              日本人CEO向けの最新の関連投稿やコメントを把握し、時流を捉えます。
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
             <form onSubmit={handleSearch} className="flex items-end gap-4 mb-8 p-6 border rounded-lg shadow-sm bg-card">
               <div className="flex-grow">
-                <Label htmlFor="keywords" className="font-semibold">Keywords / Topics</Label>
-                <Input id="keywords" placeholder="e.g., Japan market entry, AI in business, sustainability" className="mt-1" />
+                <Label htmlFor="keywords" className="font-semibold">キーワード / トピック</Label>
+                <Input id="keywords" placeholder="例：日本市場参入, ビジネスにおけるAI, サステナビリティ" className="mt-1" />
               </div>
               <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSearching}>
                 <Search className="mr-2 h-4 w-4" />
-                {isSearching ? 'Searching...' : 'Find Trends'}
+                {isSearching ? '検索中...' : 'トレンドを検索'}
               </Button>
             </form>
 
-            {isSearching && <div className="text-center py-8">Searching for trends... <TrendingUp className="inline-block animate-pulse h-5 w-5 ml-2" /></div>}
+            {isSearching && <div className="text-center py-8">トレンドを検索中... <TrendingUp className="inline-block animate-pulse h-5 w-5 ml-2" /></div>}
 
             {!isSearching && searchResults.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
                 <TrendingUp className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                <p className="text-xl">No trending posts found.</p>
-                <p>Try different keywords or check back later.</p>
+                <p className="text-xl">トレンド投稿は見つかりませんでした。</p>
+                <p>異なるキーワードを試すか、後でもう一度ご確認ください。</p>
               </div>
             )}
 
             {!isSearching && searchResults.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold mb-6 font-headline">Trending Posts ({searchResults.length})</h3>
+                <h3 className="text-xl font-semibold mb-6 font-headline">トレンド投稿 ({searchResults.length})</h3>
                 <div className="space-y-6">
                   {searchResults.map((post) => (
                     <Card key={post.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -86,14 +88,14 @@ export default function TrendWatcherPage() {
                         <Image src={post.authorAvatar} alt={post.author} width={48} height={48} className="rounded-full" data-ai-hint="profile picture" />
                         <div>
                           <CardTitle className="text-md font-semibold font-headline">{post.author}</CardTitle>
-                          <CardDescription className="text-xs text-muted-foreground">LinkedIn Post</CardDescription>
+                          <CardDescription className="text-xs text-muted-foreground">LinkedIn 投稿</CardDescription>
                         </div>
                       </CardHeader>
                       <CardContent className="p-4 pt-0">
                         <p className="mb-3 text-sm">{post.contentSnippet}</p>
                         {post.imageUrl && (
                           <div className="my-3 rounded-lg overflow-hidden border">
-                            <Image src={post.imageUrl} alt="Post image" width={600} height={300} className="w-full h-auto object-cover" data-ai-hint="social media post" />
+                            <Image src={post.imageUrl} alt="投稿画像" width={600} height={300} className="w-full h-auto object-cover" data-ai-hint="social media post" />
                           </div>
                         )}
                         <div className="flex items-center space-x-4 text-xs text-muted-foreground">
@@ -104,10 +106,10 @@ export default function TrendWatcherPage() {
                       </CardContent>
                       <CardFooter className="p-4 border-t">
                         <Button variant="outline" size="sm" onClick={() => window.open(post.postUrl, '_blank')}>
-                          View Post
+                          投稿を見る
                         </Button>
                         <Button variant="default" size="sm" className="ml-auto bg-accent hover:bg-accent/90 text-accent-foreground" asChild>
-                           <Link href={`/comments?postContent=${encodeURIComponent(post.contentSnippet)}`}>Suggest Comment</Link>
+                           <Link href={`/comments?postContent=${encodeURIComponent(post.contentSnippet)}`}>コメントを提案する</Link>
                         </Button>
                       </CardFooter>
                     </Card>
@@ -121,3 +123,5 @@ export default function TrendWatcherPage() {
     </AppLayout>
   );
 }
+
+    

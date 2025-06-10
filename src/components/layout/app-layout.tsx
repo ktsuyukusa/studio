@@ -1,3 +1,4 @@
+
 "use client";
 
 import type React from 'react';
@@ -25,12 +26,12 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: '/', label: 'Dashboard', icon: Home },
-  { href: '/profile', label: 'Profile Creation', icon: UserSquare },
-  { href: '/posts', label: 'Post Forge', icon: PenSquare },
-  { href: '/comments', label: 'Comment Assist', icon: MessageSquarePlus },
-  { href: '/leads', label: 'Lead Finder', icon: Users },
-  { href: '/trends', label: 'Trend Watcher', icon: TrendingUp },
+  { href: '/', label: 'ダッシュボード', icon: Home },
+  { href: '/profile', label: 'プロフィール作成', icon: UserSquare },
+  { href: '/posts', label: '投稿作成アシスト', icon: PenSquare },
+  { href: '/comments', label: 'コメントアシスト', icon: MessageSquarePlus },
+  { href: '/leads', label: 'リードファインダー', icon: Users },
+  { href: '/trends', label: 'トレンドウォッチャー', icon: TrendingUp },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -88,3 +89,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+    
