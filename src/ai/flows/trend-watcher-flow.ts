@@ -44,26 +44,27 @@ const trendWatcherPrompt = ai.definePrompt({
   input: {schema: TrendWatcherInputSchema},
   output: {schema: TrendWatcherOutputSchema},
   prompt: `あなたは、日本のCEO向けにLinkedIn上の最新ビジネストレンドを分析・要約する専門家です。
-提供されたキーワードに基づいて、現在注目されている可能性のある架空のLinkedIn投稿やディスカッショントピックの例を3～5件生成してください。
+あなたの主な任務は、提供された「キーワード」に**直接関連する**、現在注目されている可能性のあるLinkedIn上の架空のディスカッショントレンドや投稿の例を3～5件生成することです。
 
 キーワード: {{{keywords}}}
 
+**最重要指示:** 生成されるすべてのトレンド項目（特に\`contentSnippet\`）は、上記「キーワード」に密接に関連していなければなりません。例えば、キーワードが「日本酒 欧州市場」であれば、生成される内容は日本酒の欧州市場におけるトレンド、課題、機会、関連ニュースなどに関するものであるべきです。一般的なビジネストピックではなく、**キーワードに特化した内容**を優先してください。
+
 各トレンド項目には、以下の情報を含めてください：
 - id: ユニークなID（例: "trend-1"）
-- author: 投稿者の仮名または役職（例：「大手製造業CEO」「DXコンサルタント」）
+- author: 投稿者の仮名または役職（例：「大手飲料メーカー海外事業部長」「食品業界アナリスト」など、キーワードに関連性の高いものが望ましい）
 - authorAvatar: 著者のアバター用のプレースホルダー画像URL (https://placehold.co/80x80.png を使用)
-- authorAvatarHint: 著者のアバターのdata-ai-hint (例: 'professional portrait', 'technology expert')
-- contentSnippet: 投稿内容の簡潔な要約（2～3文程度）。日本のビジネスリーダーが関心を持つような内容にしてください。
+- authorAvatarHint: 著者のアバターのdata-ai-hint (例: 'executive portrait', 'sake expert')
+- contentSnippet: **キーワードに関連する**投稿内容やディスカッショントピックの簡潔な日本語の要約（2～3文程度）。日本のビジネスリーダーが当該キーワードについてどのような議論をしているか、または関心を持つ可能性のある内容にしてください。
 - likes: もっともらしい「いいね！」の数。
 - comments: もっともらしいコメント数。
 - reposts: もっともらしい再投稿数。
-- postUrl: このような議論がなされる可能性のある場所を示すサンプルURL（例：関連ニュースカテゴリへのリンクや、google.comでの検索クエリURLなど https://www.google.com/search?q=トピック）。
-- imageUrl: 投稿に画像が含まれそうな場合は、プレースホルダー画像URL (https://placehold.co/600x300.png を使用)。
-- imageHint: imageUrlを提供する場合、その画像のdata-ai-hint (例: 'data visualization', 'sustainable energy')
+- postUrl: このような議論がなされる可能性のある場所を示すサンプルURL（例：関連ニュースカテゴリへのリンクや、google.comでの「キーワード」に関する検索クエリURLなど https://www.google.com/search?q={{{keywords}}}）。
+- imageUrl: 投稿にキーワードと関連性の高い画像が含まれそうな場合は、プレースホルダー画像URL (https://placehold.co/600x300.png を使用)。
+- imageHint: imageUrlを提供する場合、その画像のdata-ai-hint (例: 'sake bottles on display', 'european market chart', '{{{keywords}}}')
 
-生成される内容は、日本のCEOの関心事（例：デジタルトランスフォーメーション、グローバル戦略、サステナビリティ、リーダーシップ、組織改革、最新技術のビジネス応用など）と関連性が高いものにしてください。
-contentSnippetは日本語で生成してください。
-author名は日本語、または日本のビジネスシーンで一般的な英語表記（例：Ken Suzuki, CEO of Future Inc.）にしてください。
+生成される内容は、日本のCEOが提供された「キーワード」について関心を持つであろう具体的なトレンドや議論の例でなければなりません。
+author名は日本語、または日本のビジネスシーンで一般的な英語表記にしてください。
 
 最終的なアウトプットは、指定されたJSONスキーマに従ってください。
 `,
@@ -78,15 +79,12 @@ const trendWatcherFlow = ai.defineFlow(
   async (input: TrendWatcherInput) => {
     const {output} = await trendWatcherPrompt(input);
     if (!output) {
-      // Handle cases where the AI might return an empty or unexpected response.
-      // For simplicity, returning an empty array, but more robust error handling could be added.
       return { trends: [] };
     }
-    // Ensure IDs are unique if the model doesn't guarantee it, though it's asked to.
     return {
       trends: output.trends.map((trend, index) => ({
         ...trend,
-        id: trend.id || `trend-${Date.now()}-${index}`, // Fallback ID
+        id: trend.id || `trend-${Date.now()}-${index}`,
       })),
     };
   }
