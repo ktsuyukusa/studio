@@ -23,8 +23,6 @@ const TrendAnalysisSchema = z.object({
   trendAnalysis: z.string().describe('このトレンドが日本のCEOにとって何を意味するのか、日本語での簡単な分析や考察。2～3文程度。'),
   potentialNextSteps: z.array(z.string()).optional().describe('このトレンドを踏まえ、CEOが検討しうる具体的な次のステップや情報収集の提案を日本語で。AIが生成。例：「欧州市場に特化した食品展示会への参加を検討」「現地の日本食レストランチェーンとの提携可能性を調査」'),
   sampleSearchQuery: z.string().describe('このトレンドに関する追加情報を検索するためのGoogle検索クエリ例（日本語または英語）。URLエンコードは不要。例: "日本酒 欧州市場 規制"'),
-  imageUrl: z.string().optional().describe("トレンド分析に関連する視覚情報があればプレースホルダー画像URL (https://placehold.co/600x300.png を使用)。"),
-  imageHint: z.string().optional().describe("imageUrlを提供する場合、その画像のdata-ai-hint (例: '市場分析グラフ', '欧州地図 日本酒')、キーワード「{{{keywords}}}」と関連性のあるもの。"),
 });
 export type TrendAnalysis = z.infer<typeof TrendAnalysisSchema>;
 
@@ -53,8 +51,6 @@ const trendWatcherPrompt = ai.definePrompt({
 - trendAnalysis: このトレンドが、キーワード「{{{keywords}}}」に関心を持つ日本のCEOにとって何を意味するのか、どのような影響があるのか、簡単な日本語の分析や考察を2～3文で記述してください。
 - potentialNextSteps: (任意) このトレンドを踏まえ、CEOが検討しうる具体的な次のステップや情報収集の提案を日本語で1～2点挙げてください。AIが生成するものであり、実在の企業リスト等を保証するものではありません。例えば、「{{{keywords}}} に関連する欧州の主要な業界展示会への参加を検討する」「{{{keywords}}} 分野の専門家やコンサルタントに意見を求める」といった内容です。もし具体的な提案が困難な場合は、この項目は省略しても構いません。
 - sampleSearchQuery: このトレンドに関する追加情報をGoogleで検索するための、効果的な検索クエリ例（日本語または英語）を提示してください。URLエンコードは不要です。例: "日本酒 欧州市場 最新トレンド" や "EU food import regulations sake" など。
-- imageUrl: トレンド分析を視覚的に補足する画像が必要な場合は、プレースホルダー画像URL (https://placehold.co/600x300.png を使用)。画像は「{{{keywords}}}」と関連性が高いものにしてください。
-- imageHint: imageUrlを提供する場合、その画像のdata-ai-hint。キーワード「{{{keywords}}}」に関連性の高いものを2単語以内で指定してください (例: '日本酒 輸出データ', '欧州規制 資料')。
 
 生成される内容は、LinkedInの投稿のような形式ではなく、純粋なビジネス分析レポートの形式で、客観的かつ洞察に富んだものでなければなりません。
 「LinkedIn上の注目トピック」のような文言は使用しないでください。
@@ -80,32 +76,27 @@ const trendWatcherFlow = ai.defineFlow(
     }
 
     if (!rawOutputFromPrompt || !rawOutputFromPrompt.analyzedTrends || !Array.isArray(rawOutputFromPrompt.analyzedTrends)) {
-      // Fallback if the AI output structure is not as expected (e.g., missing analyzedTrends or it's not an array)
+      console.warn('Trend Watcher: AI output structure is not as expected, returning empty trends. Received:', rawOutputFromPrompt);
       return { analyzedTrends: [] };
     }
     
-    // At this point, rawOutputFromPrompt.analyzedTrends is an array, but its items might be malformed.
-    // We will validate each item and provide defaults.
     const validatedTrends = rawOutputFromPrompt.analyzedTrends.map((trend, index) => {
       const currentTrend = typeof trend === 'object' && trend !== null ? trend : {};
       
-      // Ensure keyTrendPoints and potentialNextSteps are arrays, defaulting to empty if not.
       const keyPoints = Array.isArray(currentTrend.keyTrendPoints) ? currentTrend.keyTrendPoints : [];
       const nextSteps = currentTrend.potentialNextSteps && Array.isArray(currentTrend.potentialNextSteps) 
                         ? currentTrend.potentialNextSteps 
-                        : undefined; // Keep optional if not a valid array or not present
+                        : undefined; 
 
       return {
         id: String(currentTrend.id || `trend-${Date.now()}-${index}`),
         trendTitle: String(currentTrend.trendTitle || 'タイトル未設定'),
-        keyTrendPoints: keyPoints.map(String), // Ensure all items in keyTrendPoints are strings
+        keyTrendPoints: keyPoints.map(String), 
         trendAnalysis: String(currentTrend.trendAnalysis || '分析未提供'),
-        potentialNextSteps: nextSteps ? nextSteps.map(String) : undefined, // Ensure items are strings if array exists
+        potentialNextSteps: nextSteps ? nextSteps.map(String) : undefined, 
         sampleSearchQuery: String(currentTrend.sampleSearchQuery || ''),
-        imageUrl: typeof currentTrend.imageUrl === 'string' ? currentTrend.imageUrl : undefined,
-        imageHint: typeof currentTrend.imageHint === 'string' ? currentTrend.imageHint : undefined,
-      } as TrendAnalysis; // Assert as TrendAnalysis after defaults and string conversions
-    }).filter(trend => trend.trendTitle !== 'タイトル未設定'); // Optionally filter out trends that are too malformed
+      } as TrendAnalysis; 
+    }).filter(trend => trend.trendTitle !== 'タイトル未設定' && trend.keyTrendPoints.length > 0 && trend.trendAnalysis !== '分析未提供');
 
     return { analyzedTrends: validatedTrends };
   }

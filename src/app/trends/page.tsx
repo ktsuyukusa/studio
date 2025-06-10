@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { TrendingUp, Search, ExternalLink, Lightbulb, ListChecks, MessageSquarePlus } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { generateTrendingTopics, type TrendWatcherInput, type TrendWatcherOutput, type TrendAnalysis } from '@/ai/flows/trend-watcher-flow';
@@ -40,17 +39,16 @@ export default function TrendWatcherPage() {
         if (result.analyzedTrends.length === 0) {
           toast({
             title: "分析結果なし",
-            description: "指定されたキーワードに一致するトレンド分析結果は見つかりませんでした。",
+            description: "指定されたキーワードに一致するトレンド分析結果は見つかりませんでした。キーワードを変更して再度お試しください。",
           });
         } else {
           toast({
             title: "トレンド分析完了",
-            description: "AIが関連するビジネストレンド情報を生成しました。",
+            description: `AIが${result.analyzedTrends.length}件の関連するビジネストレンド情報を生成しました。`,
           });
         }
       } else {
-        // This error is thrown if the structure from the AI flow is not as expected.
-        console.error("Unexpected result structure from AI flow:", result);
+        console.error("AI Response Error: Unexpected result structure from AI flow:", result);
         throw new Error("AIからの応答が正しくありません。");
       }
     } catch (error) {
@@ -58,7 +56,7 @@ export default function TrendWatcherPage() {
       const errorMessage = error instanceof Error ? error.message : "トレンド分析情報の取得に失敗しました。";
       toast({
         title: "エラー",
-        description: errorMessage === "AIからの応答が正しくありません。" ? "AIからの応答の解析に失敗しました。入力キーワードを変えて再度お試しください。" : "トレンド分析情報の取得に失敗しました。もう一度お試しください。",
+        description: errorMessage === "AIからの応答が正しくありません。" ? "AIからの応答の解析に失敗しました。入力キーワードを変えて再度お試しください。" : "トレンド分析情報の取得に失敗しました。ネットワーク接続を確認するか、時間を置いて再度お試しください。",
         variant: "destructive",
       });
     }
@@ -126,17 +124,6 @@ export default function TrendWatcherPage() {
                         <CardTitle className="text-lg md:text-xl font-headline text-primary">{trend.trendTitle}</CardTitle>
                       </CardHeader>
                       <CardContent className="p-4 md:p-6 space-y-4">
-                        {trend.imageUrl && (
-                          <div className="my-3 rounded-lg overflow-hidden border aspect-video relative">
-                            <Image 
-                              src={trend.imageUrl} 
-                              alt={trend.trendTitle || "トレンド関連画像"}
-                              fill 
-                              className="object-cover" 
-                              data-ai-hint={trend.imageHint || "business analysis"}
-                            />
-                          </div>
-                        )}
                         <div>
                           <h4 className="font-semibold text-md mb-2 flex items-center"><ListChecks className="h-5 w-5 mr-2 text-primary/80" /> 主要トレンドポイント</h4>
                           <ul className="list-disc list-inside space-y-1 text-sm ml-2" lang="ja">
@@ -181,7 +168,7 @@ export default function TrendWatcherPage() {
                             className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground" 
                             asChild
                         >
-                           <Link href={`/comments?postContent=${encodeURIComponent(trend.trendTitle + "\\n\\n" + trend.keyTrendPoints.join("\\n") + "\\n\\n考察: " + trend.trendAnalysis)}&ceoProfile=日本のCEOとして、このトレンドについてコメントします。`}>
+                           <Link href={`/comments?postContent=${encodeURIComponent(trend.trendTitle + "\\n\\n主要ポイント：\\n" + trend.keyTrendPoints.join("\\n") + "\\n\\n考察: " + trend.trendAnalysis)}&ceoProfile=日本のCEOとして、このトレンドについてコメントします。`}>
                              <MessageSquarePlus className="mr-2 h-4 w-4" />
                              このトレンドについてコメントを生成
                            </Link>
