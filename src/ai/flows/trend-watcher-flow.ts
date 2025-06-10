@@ -71,31 +71,42 @@ const trendWatcherFlow = ai.defineFlow(
     outputSchema: TrendWatcherOutputSchema,
   },
   async (input: TrendWatcherInput): Promise<TrendWatcherOutput> => {
-    const {output} = await trendWatcherPrompt(input);
-
-    if (!output || !output.analyzedTrends || !Array.isArray(output.analyzedTrends)) {
-      return { analyzedTrends: [] };
+    let rawOutputFromPrompt;
+    try {
+      rawOutputFromPrompt = (await trendWatcherPrompt(input)).output;
+    } catch (e) {
+      console.error('Error calling trendWatcherPrompt:', e);
+      return { analyzedTrends: [] }; // Graceful fallback on prompt error
     }
 
-    const validatedTrends = output.analyzedTrends.map((trend, index) => {
-      // Ensure trend is an object before spreading, though Zod schema should enforce this for items in the array.
+    if (!rawOutputFromPrompt || !rawOutputFromPrompt.analyzedTrends || !Array.isArray(rawOutputFromPrompt.analyzedTrends)) {
+      // Fallback if the AI output structure is not as expected (e.g., missing analyzedTrends or it's not an array)
+      return { analyzedTrends: [] };
+    }
+    
+    // At this point, rawOutputFromPrompt.analyzedTrends is an array, but its items might be malformed.
+    // We will validate each item and provide defaults.
+    const validatedTrends = rawOutputFromPrompt.analyzedTrends.map((trend, index) => {
       const currentTrend = typeof trend === 'object' && trend !== null ? trend : {};
+      
+      // Ensure keyTrendPoints and potentialNextSteps are arrays, defaulting to empty if not.
+      const keyPoints = Array.isArray(currentTrend.keyTrendPoints) ? currentTrend.keyTrendPoints : [];
+      const nextSteps = currentTrend.potentialNextSteps && Array.isArray(currentTrend.potentialNextSteps) 
+                        ? currentTrend.potentialNextSteps 
+                        : undefined; // Keep optional if not a valid array or not present
+
       return {
-        id: currentTrend.id || `trend-${Date.now()}-${index}`,
-        trendTitle: currentTrend.trendTitle || '',
-        keyTrendPoints: Array.isArray(currentTrend.keyTrendPoints) ? currentTrend.keyTrendPoints : [],
-        trendAnalysis: currentTrend.trendAnalysis || '',
-        potentialNextSteps: currentTrend.potentialNextSteps && Array.isArray(currentTrend.potentialNextSteps) ? currentTrend.potentialNextSteps : undefined,
-        sampleSearchQuery: currentTrend.sampleSearchQuery || '',
-        imageUrl: currentTrend.imageUrl, // Optional, so pass through
-        imageHint: currentTrend.imageHint, // Optional, so pass through
-        // Spread other properties from currentTrend if TrendAnalysisSchema has more than listed here
-        ...currentTrend,
-      } as TrendAnalysis; // Assert as TrendAnalysis after defaults
-    });
+        id: String(currentTrend.id || `trend-${Date.now()}-${index}`),
+        trendTitle: String(currentTrend.trendTitle || 'タイトル未設定'),
+        keyTrendPoints: keyPoints.map(String), // Ensure all items in keyTrendPoints are strings
+        trendAnalysis: String(currentTrend.trendAnalysis || '分析未提供'),
+        potentialNextSteps: nextSteps ? nextSteps.map(String) : undefined, // Ensure items are strings if array exists
+        sampleSearchQuery: String(currentTrend.sampleSearchQuery || ''),
+        imageUrl: typeof currentTrend.imageUrl === 'string' ? currentTrend.imageUrl : undefined,
+        imageHint: typeof currentTrend.imageHint === 'string' ? currentTrend.imageHint : undefined,
+      } as TrendAnalysis; // Assert as TrendAnalysis after defaults and string conversions
+    }).filter(trend => trend.trendTitle !== 'タイトル未設定'); // Optionally filter out trends that are too malformed
 
     return { analyzedTrends: validatedTrends };
   }
 );
-
-    

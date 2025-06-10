@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, Search, ExternalLink, Lightbulb, ListChecks } from 'lucide-react';
+import { TrendingUp, Search, ExternalLink, Lightbulb, ListChecks, MessageSquarePlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
@@ -34,7 +34,8 @@ export default function TrendWatcherPage() {
     setSearchResults([]);
     try {
       const result: TrendWatcherOutput = await generateTrendingTopics({ keywords } as TrendWatcherInput);
-      if (result && result.analyzedTrends) {
+      
+      if (result && result.analyzedTrends && Array.isArray(result.analyzedTrends)) {
         setSearchResults(result.analyzedTrends);
         if (result.analyzedTrends.length === 0) {
           toast({
@@ -48,13 +49,16 @@ export default function TrendWatcherPage() {
           });
         }
       } else {
+        // This error is thrown if the structure from the AI flow is not as expected.
+        console.error("Unexpected result structure from AI flow:", result);
         throw new Error("AIからの応答が正しくありません。");
       }
     } catch (error) {
       console.error("Error fetching trend analysis:", error);
+      const errorMessage = error instanceof Error ? error.message : "トレンド分析情報の取得に失敗しました。";
       toast({
         title: "エラー",
-        description: "トレンド分析情報の取得に失敗しました。もう一度お試しください。",
+        description: errorMessage === "AIからの応答が正しくありません。" ? "AIからの応答の解析に失敗しました。入力キーワードを変えて再度お試しください。" : "トレンド分析情報の取得に失敗しました。もう一度お試しください。",
         variant: "destructive",
       });
     }
@@ -177,7 +181,7 @@ export default function TrendWatcherPage() {
                             className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground" 
                             asChild
                         >
-                           <Link href={`/comments?postContent=${encodeURIComponent(trend.trendTitle + "\n\n" + trend.keyTrendPoints.join("\n") + "\n\n考察: " + trend.trendAnalysis)}&ceoProfile=日本のCEOとして、このトレンドについてコメントします。`}>
+                           <Link href={`/comments?postContent=${encodeURIComponent(trend.trendTitle + "\\n\\n" + trend.keyTrendPoints.join("\\n") + "\\n\\n考察: " + trend.trendAnalysis)}&ceoProfile=日本のCEOとして、このトレンドについてコメントします。`}>
                              <MessageSquarePlus className="mr-2 h-4 w-4" />
                              このトレンドについてコメントを生成
                            </Link>
@@ -194,4 +198,3 @@ export default function TrendWatcherPage() {
     </AppLayout>
   );
 }
-
