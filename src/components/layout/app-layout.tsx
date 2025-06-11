@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import Logo from '@/components/icons/logo';
 import { Button } from '@/components/ui/button';
-import { Home, UserSquare, PenSquare, MessageSquarePlus, Users, TrendingUp, PanelLeft } from 'lucide-react';
+import { Home, UserSquare, PenSquare, MessageSquarePlus, TrendingUp, PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -30,8 +30,7 @@ const navItems: NavItem[] = [
   { href: '/profile', label: 'プロフィール作成', icon: UserSquare },
   { href: '/posts', label: '投稿作成アシスト', icon: PenSquare },
   { href: '/comments', label: 'コメントアシスト', icon: MessageSquarePlus },
-  { href: '/leads', label: 'リードファインダー', icon: Users },
-  { href: '/trends', label: 'トレンドウォッチャー', icon: TrendingUp },
+  { href: '/trends', label: 'AI トレンドアナリスト', icon: TrendingUp },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -89,5 +88,3 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-
-    

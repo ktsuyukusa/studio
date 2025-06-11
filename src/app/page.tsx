@@ -2,7 +2,7 @@
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, UserSquare, PenSquare, MessageSquarePlus, Users, TrendingUp } from 'lucide-react';
+import { ArrowRight, UserSquare, PenSquare, MessageSquarePlus, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -13,7 +13,7 @@ const features = [
     icon: UserSquare,
     href: '/profile',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'linkedin profile',
+    aiHint: 'professional profile writing',
     buttonText: 'プロフィール作成へ',
   },
   {
@@ -22,7 +22,7 @@ const features = [
     icon: PenSquare,
     href: '/posts',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'content creation',
+    aiHint: 'ai content generation',
     buttonText: '投稿作成アシストへ',
   },
   {
@@ -31,26 +31,17 @@ const features = [
     icon: MessageSquarePlus,
     href: '/comments',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'social engagement',
+    aiHint: 'social media engagement ai',
     buttonText: 'コメントアシストへ',
   },
   {
-    title: 'リードファインダー',
-    description: '基準に基づいて関連性の高いリードを見つけ、連絡先情報にアクセスします。',
-    icon: Users,
-    href: '/leads',
-    image: 'https://placehold.co/600x400.png',
-    aiHint: 'lead generation',
-    buttonText: 'リードファインダーへ',
-  },
-  {
-    title: 'トレンドウォッチャー',
-    description: '日本人CEO向けの最新の関連投稿やコメントを把握し、時流を捉えます。',
+    title: 'AI トレンドアナリスト',
+    description: '日本人CEO向けの最新の関連トレンドや考察をAIが分析・提供します。',
     icon: TrendingUp,
     href: '/trends',
     image: 'https://placehold.co/600x400.png',
-    aiHint: 'trend analysis',
-    buttonText: 'トレンドウォッチャーへ',
+    aiHint: 'business trend analysis',
+    buttonText: 'トレンドアナリストへ',
   },
 ];
 
@@ -61,11 +52,11 @@ export default function DashboardPage() {
         <header className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight font-headline">Globalink CEO へようこそ</h1>
           <p className="text-muted-foreground">
-            LinkedInを最大限に活用し、グローバルなリーチを拡大するためのAI搭載アシスタントです。
+            AIを活用してLinkedInでの影響力を高め、グローバルなビジネスチャンスを掴むためのアシスタントツールです。
           </p>
         </header>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2"> {/* Adjusted grid for 4 items */}
           {features.map((feature) => (
             <Card key={feature.title} className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="relative h-48 w-full">
