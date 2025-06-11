@@ -28,6 +28,20 @@ const dummyLeads: Lead[] = [
   { id: '3', name: '高橋 愛', title: 'プロダクトリード', company: '京都イノベーションズ', location: '京都、日本', industry: 'ソフトウェア', avatarUrl: 'https://placehold.co/100x100.png', linkedinUrl: '#' },
 ];
 
+const industryOptions = [
+  { value: "food_beverage", label: "飲食業" },
+  { value: "retail_wholesale_distribution", label: "小売・卸売・流通" },
+  { value: "it_web_development", label: "IT・Web開発" },
+  { value: "manufacturing", label: "製造業" },
+  { value: "cleaning_services", label: "清掃業" },
+  { value: "consulting", label: "コンサルタント" },
+  { value: "fortune_telling_healing", label: "手相・数秘・ヒーリング" },
+  { value: "finance_insurance", label: "金融・保険" },
+  { value: "photography", label: "写真家" },
+  { value: "handicrafts_crafts", label: "手芸・クラフト" },
+  { value: "art_design", label: "美術・デザイン" },
+];
+
 export default function LeadFinderPage() {
   const [searchResults, setSearchResults] = useState<Lead[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -64,10 +78,11 @@ export default function LeadFinderPage() {
                     <SelectValue placeholder="業界を選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="technology">テクノロジー</SelectItem>
-                    <SelectItem value="finance">金融</SelectItem>
-                    <SelectItem value="healthcare">ヘルスケア</SelectItem>
-                    <SelectItem value="manufacturing">製造業</SelectItem>
+                    {industryOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -137,5 +152,3 @@ export default function LeadFinderPage() {
     </AppLayout>
   );
 }
-
-    
