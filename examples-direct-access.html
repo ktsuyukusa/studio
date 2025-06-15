@@ -78,14 +78,36 @@
         <p>Access the examples section directly using the links below. These links will take you directly to the examples pages on your Vercel deployment.</p>
         
         <div class="button-container">
-            <a href="https://studio-ktsuyukusa.vercel.app/examples" class="button">Examples Overview</a>
-            <a href="https://studio-ktsuyukusa.vercel.app/examples/images" class="button outline">Images Example</a>
-            <a href="https://studio-ktsuyukusa.vercel.app/examples/analytics" class="button outline">Analytics Example</a>
+            <p><strong>Step 1:</strong> Enter your Vercel deployment URL:</p>
+            <input type="text" id="baseUrl" placeholder="e.g., https://your-project.vercel.app" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #d1d5db; border-radius: 4px;">
+            
+            <button onclick="openExamples('/')" class="button">Examples Overview</button>
+            <button onclick="openExamples('/images')" class="button outline">Images Example</button>
+            <button onclick="openExamples('/analytics')" class="button outline">Analytics Example</button>
         </div>
     </div>
     
     <div class="note">
         <strong>Note:</strong> If you're still having issues accessing the examples through the Vercel deployment, you may need to wait a few minutes for the deployment to complete. If the issue persists, you'll need to fix the Firebase authentication issue by following the instructions in the FIREBASE_AUTH_ISSUE.md file.
     </div>
+
+    <script>
+        function openExamples(path) {
+            const baseUrl = document.getElementById('baseUrl').value.trim();
+            if (!baseUrl) {
+                alert('Please enter your Vercel deployment URL first');
+                return;
+            }
+            
+            // Remove trailing slash if present
+            const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+            
+            // Construct the full URL
+            const fullUrl = `${cleanBaseUrl}/examples${path}`;
+            
+            // Open in a new tab
+            window.open(fullUrl, '_blank');
+        }
+    </script>
 </body>
 </html>
