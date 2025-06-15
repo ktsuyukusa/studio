@@ -105,7 +105,7 @@
     </div>
 
     <script>
-        async function testRedirect(path) {
+        function testRedirect(path) {
             const baseUrl = document.getElementById('baseUrl').value.trim();
             const resultDiv = document.getElementById('result');
             
@@ -121,35 +121,23 @@
             const fullUrl = `${cleanBaseUrl}${path}`;
             
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `Testing redirect to: ${fullUrl}\n\nChecking...`;
+            resultDiv.innerHTML = `
+                Opening: ${fullUrl}
+                
+                A new tab will open with the URL. Please check if you're redirected to the correct page.
+                
+                Expected behavior:
+                - /auth should show the login page
+                - /examples should show the examples overview
+                - /examples/analytics should show the analytics example
+                - /examples/images should show the images example
+                
+                If you see content from one page on another page (e.g., analytics content on the login page),
+                try clearing your browser cache and cookies, then try again.
+            `;
             
-            try {
-                const response = await fetch(fullUrl, {
-                    method: 'HEAD',
-                    redirect: 'manual',
-                    mode: 'no-cors' // This is needed for cross-origin requests
-                });
-                
-                // Due to CORS restrictions, we can't actually see the redirect
-                // But we can open the URL in a new tab for the user to check
-                resultDiv.innerHTML = `
-                    Testing: ${fullUrl}
-                    
-                    Due to browser security restrictions, we can't programmatically check redirects across domains.
-                    
-                    A new tab will open with the URL. Please check if you're redirected to the correct page.
-                    
-                    Expected behavior:
-                    - /auth should show the login page
-                    - /examples should show the examples overview
-                    - /examples/analytics should show the analytics example
-                    - /examples/images should show the images example
-                `;
-                
-                window.open(fullUrl, '_blank');
-            } catch (error) {
-                resultDiv.innerHTML = `Error testing redirect: ${error.message}`;
-            }
+            // Simply open the URL in a new tab
+            window.open(fullUrl, '_blank');
         }
     </script>
 </body>
