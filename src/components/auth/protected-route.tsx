@@ -13,12 +13,16 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // List of public paths that don't require authentication
+  const publicPaths = ['/auth', '/examples', '/examples/images', '/examples/analytics'];
+  const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
+
   useEffect(() => {
     // Skip redirect during initial loading
     if (loading) return;
 
-    // If user is not authenticated and not on the auth page, redirect to auth page
-    if (!user && pathname !== '/auth') {
+    // If user is not authenticated and not on a public page, redirect to auth page
+    if (!user && !isPublicPath) {
       router.push('/auth');
     }
 
@@ -26,10 +30,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     if (user && pathname === '/auth') {
       router.push('/');
     }
-  }, [user, loading, router, pathname]);
+  }, [user, loading, router, pathname, isPublicPath]);
 
   // Show nothing while loading or redirecting
-  if (loading || (!user && pathname !== '/auth') || (user && pathname === '/auth')) {
+  if (loading || (!user && !isPublicPath) || (user && pathname === '/auth')) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -37,6 +41,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Render children only when authenticated or on the auth page
+  // Render children when authenticated or on a public page
   return <>{children}</>;
 }
