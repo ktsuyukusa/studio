@@ -43,28 +43,6 @@ export default function AuthPage() {
           </p>
         </div>
 
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Examples Section</CardTitle>
-            <CardDescription>
-              Access the examples section without authentication
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-4">
-              <Button asChild variant="default" className="w-full">
-                <Link href="/examples">Go to Examples</Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/examples/images">Images Example</Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/examples/analytics">Analytics Example</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         <Tabs 
           defaultValue={activeTab} 
           onValueChange={setActiveTab}
