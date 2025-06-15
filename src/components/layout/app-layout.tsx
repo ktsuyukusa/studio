@@ -18,6 +18,7 @@ import Logo from '@/components/icons/logo';
 import { Button } from '@/components/ui/button';
 import { Home, UserSquare, PenSquare, MessageSquarePlus, TrendingUp, PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import UserMenu from '@/components/auth/user-menu';
 
 interface NavItem {
   href: string;
@@ -70,15 +71,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarContent>
       </Sidebar>
       <SidebarInset className="flex-1 flex flex-col bg-background">
-         <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 py-4 md:hidden">
-          <SidebarTrigger asChild>
-            <Button size="icon" variant="outline" className="md:hidden">
-              <PanelLeft className="h-5 w-5" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
-          </SidebarTrigger>
+         <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6 py-4">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger asChild>
+              <Button size="icon" variant="outline" className="md:hidden">
+                <PanelLeft className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SidebarTrigger>
+            <div className="flex items-center md:hidden">
+              <Logo />
+            </div>
+          </div>
           <div className="flex items-center">
-            <Logo />
+            <UserMenu />
           </div>
         </header>
         <main className="flex-1 p-6 overflow-auto">

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Authentication Test</title>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqXhkPnc8p8coutoZKnfLtvs92TRbDoeY",
+      authDomain: "globalink-ceo.firebaseapp.com",
+      projectId: "globalink-ceo",
+      storageBucket: "globalink-ceo.appspot.com",
+      messagingSenderId: "199954181433",
+      appId: "1:199954181433:web:4010fa8c76dc960477cce8"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Function to test Firebase authentication
+    async function testFirebaseAuth() {
+      const resultDiv = document.getElementById('result');
+      const errorDiv = document.getElementById('error');
+      const testButton = document.getElementById('testButton');
+      
+      resultDiv.innerHTML = '';
+      errorDiv.innerHTML = '';
+      testButton.disabled = true;
+      testButton.textContent = 'Testing...';
+      
+      try {
+        console.log('Testing Firebase authentication...');
+        console.log('Firebase auth instance:', auth);
+        
+        // Try to create a test user
+        const email = 'test-' + Date.now() + '@example.com';
+        const password = 'TestPassword123!';
+        
+        console.log('Attempting to create user with email:', email);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log('User created successfully:', userCredential.user);
+        
+        resultDiv.innerHTML = `
+          <h3>Success!</h3>
+          <p>Created user with email: ${email}</p>
+          <pre>${JSON.stringify(userCredential.user, null, 2)}</pre>
+        `;
+      } catch (error) {
+        console.error('Firebase auth test failed:', error);
+        errorDiv.innerHTML = `
+          <h3>Error!</h3>
+          <p>Code: ${error.code}</p>
+          <p>Message: ${error.message}</p>
+          <pre>${JSON.stringify(error, null, 2)}</pre>
+        `;
+      } finally {
+        testButton.disabled = false;
+        testButton.textContent = 'Run Firebase Auth Test';
+      }
+    }
+
+    // Expose the test function to the global scope
+    window.testFirebaseAuth = testFirebaseAuth;
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      font-size: 16px;
+      margin: 20px auto;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    #result {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    #error {
+      background-color: #ffebee;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Firebase Authentication Test</h1>
+  <p>This page tests Firebase authentication by creating a random test user.</p>
+  
+  <button id="testButton" onclick="testFirebaseAuth()">Run Firebase Auth Test</button>
+  
+  <div id="result"></div>
+  <div id="error"></div>
+</body>
+</html>

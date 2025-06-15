@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
+import { FirebaseProvider } from '@/lib/firebase/firebase-provider';
+import ProtectedRoute from '@/components/auth/protected-route';
 
 export const metadata: Metadata = {
   title: 'Globalink CEO',
@@ -21,10 +23,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
-        <SidebarProvider defaultOpen={true}>
-          {children}
-        </SidebarProvider>
-        <Toaster />
+        <FirebaseProvider>
+          <ProtectedRoute>
+            <SidebarProvider defaultOpen={true}>
+              {children}
+            </SidebarProvider>
+            <Toaster />
+          </ProtectedRoute>
+        </FirebaseProvider>
       </body>
     </html>
   );
