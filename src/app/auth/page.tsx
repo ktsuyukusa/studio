@@ -34,8 +34,8 @@ export default function AuthPage() {
 
   // If not loading and user is null, show auth page
   return (
-    <div className="container flex items-center justify-center min-h-screen py-12">
-      <div className="w-full max-w-md space-y-6">
+    <div className="flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-6 mx-auto">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Globalink CEO</h1>
           <p className="text-muted-foreground mt-2">
