@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9fafb;
+        }
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+        .card p {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #1d4ed8;
+        }
+        .button.outline {
+            background-color: transparent;
+            color: #2563eb;
+            border: 1px solid #2563eb;
+        }
+        .button.outline:hover {
+            background-color: #eff6ff;
+        }
+        .note {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f3f4f6;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>Redirect Test</h1>
+    
+    <div class="card">
+        <h2>Test Redirects</h2>
+        <p>Enter your Vercel deployment URL and test different paths to see if they redirect correctly.</p>
+        
+        <div class="button-container">
+            <p><strong>Step 1:</strong> Enter your Vercel deployment URL:</p>
+            <input type="text" id="baseUrl" placeholder="e.g., https://your-project.vercel.app" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #d1d5db; border-radius: 4px;">
+            
+            <p><strong>Step 2:</strong> Select a path to test:</p>
+            <button onclick="testRedirect('/')" class="button">Home Page</button>
+            <button onclick="testRedirect('/auth')" class="button outline">Auth Page</button>
+            <button onclick="testRedirect('/examples')" class="button outline">Examples Page</button>
+            <button onclick="testRedirect('/examples/analytics')" class="button outline">Analytics Example</button>
+            <button onclick="testRedirect('/examples/images')" class="button outline">Images Example</button>
+        </div>
+        
+        <div id="result" style="display: none;"></div>
+    </div>
+    
+    <div class="note">
+        <strong>Note:</strong> This tool will help you understand if you're being redirected correctly. If you're seeing content from one page on another page, it could be due to a routing issue or a caching problem.
+    </div>
+
+    <script>
+        async function testRedirect(path) {
+            const baseUrl = document.getElementById('baseUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!baseUrl) {
+                alert('Please enter your Vercel deployment URL first');
+                return;
+            }
+            
+            // Remove trailing slash if present
+            const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+            
+            // Construct the full URL
+            const fullUrl = `${cleanBaseUrl}${path}`;
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `Testing redirect to: ${fullUrl}\n\nChecking...`;
+            
+            try {
+                const response = await fetch(fullUrl, {
+                    method: 'HEAD',
+                    redirect: 'manual',
+                    mode: 'no-cors' // This is needed for cross-origin requests
+                });
+                
+                // Due to CORS restrictions, we can't actually see the redirect
+                // But we can open the URL in a new tab for the user to check
+                resultDiv.innerHTML = `
+                    Testing: ${fullUrl}
+                    
+                    Due to browser security restrictions, we can't programmatically check redirects across domains.
+                    
+                    A new tab will open with the URL. Please check if you're redirected to the correct page.
+                    
+                    Expected behavior:
+                    - /auth should show the login page
+                    - /examples should show the examples overview
+                    - /examples/analytics should show the analytics example
+                    - /examples/images should show the images example
+                `;
+                
+                window.open(fullUrl, '_blank');
+            } catch (error) {
+                resultDiv.innerHTML = `Error testing redirect: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
