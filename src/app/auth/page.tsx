@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import EmailLinkAuth from '@/components/auth/email-link-auth';
 import GoogleAuth from '@/components/auth/google-auth';
 import { useAuth } from '@/lib/firebase/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>('email-link');
@@ -40,6 +42,28 @@ export default function AuthPage() {
             AIを活用してLinkedInでの影響力を高めるためのアシスタントツール
           </p>
         </div>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Examples Section</CardTitle>
+            <CardDescription>
+              Access the examples section without authentication
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              <Button asChild variant="default" className="w-full">
+                <Link href="/examples">Go to Examples</Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/examples/images">Images Example</Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/examples/analytics">Analytics Example</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Tabs 
           defaultValue={activeTab} 
