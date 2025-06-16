@@ -100,11 +100,11 @@ export default function UserProfileForm() {
       return;
     }
     
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 1MB for base64 encoding)
+    if (file.size > 1 * 1024 * 1024) {
       toast({
         title: 'ファイルサイズが大きすぎます',
-        description: 'アップロードできるファイルサイズは最大5MBです。',
+        description: 'アップロードできるファイルサイズは最大1MBです。',
         variant: 'destructive',
       });
       return;
@@ -113,30 +113,36 @@ export default function UserProfileForm() {
     setUploadingPhoto(true);
     
     try {
-      console.log('Starting file upload to Firebase Storage');
+      // Read the file as a data URL (base64)
+      const reader = new FileReader();
       
-      // Create a local URL for the file for immediate display
-      const localURL = URL.createObjectURL(file);
+      reader.onload = async (e) => {
+        if (!e.target || typeof e.target.result !== 'string') {
+          throw new Error('Failed to read file');
+        }
+        
+        const dataUrl = e.target.result;
+        console.log('File converted to data URL');
+        
+        // Update profile with the data URL
+        await updateProfile({ photoURL: dataUrl });
+        console.log('Profile updated with data URL');
+        
+        toast({
+          title: 'プロフィール写真を更新しました',
+          description: 'プロフィール写真が正常に更新されました。',
+        });
+        
+        setUploadingPhoto(false);
+      };
       
-      // Update profile with local URL first for immediate feedback
-      if (profile && profile.id) {
-        const tempProfile = { ...profile, photoURL: localURL };
-        // This is just for UI display, not saved to database
-        document.querySelector('.profile-photo-preview')?.setAttribute('src', localURL);
-      }
+      reader.onerror = () => {
+        throw new Error('Failed to read file');
+      };
       
-      // Upload file to Firebase Storage
-      const downloadURL = await uploadFile(file, 'profile-photos');
-      console.log('File uploaded successfully, download URL:', downloadURL);
+      // Start reading the file
+      reader.readAsDataURL(file);
       
-      // Update user profile with new photo URL from Firebase
-      await updateProfile({ photoURL: downloadURL });
-      console.log('Profile updated with new photo URL');
-      
-      toast({
-        title: 'プロフィール写真を更新しました',
-        description: 'プロフィール写真が正常に更新されました。',
-      });
     } catch (error) {
       console.error('Error uploading profile photo:', error);
       let errorMessage = 'プロフィール写真のアップロード中にエラーが発生しました。';
@@ -151,7 +157,7 @@ export default function UserProfileForm() {
         description: errorMessage,
         variant: 'destructive',
       });
-    } finally {
+      
       setUploadingPhoto(false);
     }
   };
@@ -223,7 +229,7 @@ export default function UserProfileForm() {
               onChange={handlePhotoUpload}
             />
             <p className="text-xs text-muted-foreground">
-              JPG, PNG, GIF形式の画像をアップロードできます（最大5MB）
+              JPG, PNG, GIF形式の画像をアップロードできます（最大1MB）
             </p>
           </div>
         </div>
