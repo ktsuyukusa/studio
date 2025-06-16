@@ -83,7 +83,7 @@ export default function CommentAssistForm() {
                 <FormLabel>LinkedIn投稿の内容</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="ここにLinkedIn投稿の本文を貼り付けてください..."
+                    placeholder="ここにコメントを書きたいLinkedIn投稿の本文を貼り付けてください..."
                     className="resize-y min-h-[150px]"
                     {...field}
                   />
