@@ -88,6 +88,7 @@ export default function UserProfileForm() {
     if (!files || files.length === 0) return;
     
     const file = files[0];
+    console.log('Selected file:', file.name, file.type, file.size);
     
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -112,11 +113,25 @@ export default function UserProfileForm() {
     setUploadingPhoto(true);
     
     try {
+      console.log('Starting file upload to Firebase Storage');
+      
+      // Create a local URL for the file for immediate display
+      const localURL = URL.createObjectURL(file);
+      
+      // Update profile with local URL first for immediate feedback
+      if (profile && profile.id) {
+        const tempProfile = { ...profile, photoURL: localURL };
+        // This is just for UI display, not saved to database
+        document.querySelector('.profile-photo-preview')?.setAttribute('src', localURL);
+      }
+      
       // Upload file to Firebase Storage
       const downloadURL = await uploadFile(file, 'profile-photos');
+      console.log('File uploaded successfully, download URL:', downloadURL);
       
-      // Update user profile with new photo URL
+      // Update user profile with new photo URL from Firebase
       await updateProfile({ photoURL: downloadURL });
+      console.log('Profile updated with new photo URL');
       
       toast({
         title: 'プロフィール写真を更新しました',
@@ -124,9 +139,16 @@ export default function UserProfileForm() {
       });
     } catch (error) {
       console.error('Error uploading profile photo:', error);
+      let errorMessage = 'プロフィール写真のアップロード中にエラーが発生しました。';
+      
+      if (error instanceof Error) {
+        errorMessage += ` エラー: ${error.message}`;
+        console.error('Error details:', error.stack);
+      }
+      
       toast({
         title: 'エラーが発生しました',
-        description: 'プロフィール写真のアップロード中にエラーが発生しました。',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -167,7 +189,7 @@ export default function UserProfileForm() {
                 src={profile.photoURL} 
                 alt={profile.displayName} 
                 fill 
-                className="object-cover"
+                className="object-cover profile-photo-preview"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
