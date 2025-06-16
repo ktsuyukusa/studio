@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useUser } from '@/lib/contexts/user-context';
+import { useStorage } from '@/lib/firebase/storage-context';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -36,8 +38,11 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function UserProfileForm() {
   const { profile, updateProfile } = useUser();
+  const { uploadFile } = useStorage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -78,6 +83,63 @@ export default function UserProfileForm() {
     }
   }
 
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: '画像ファイルを選択してください',
+        description: 'アップロードできるのは画像ファイルのみです。',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'ファイルサイズが大きすぎます',
+        description: 'アップロードできるファイルサイズは最大5MBです。',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setUploadingPhoto(true);
+    
+    try {
+      // Upload file to Firebase Storage
+      const downloadURL = await uploadFile(file, 'profile-photos');
+      
+      // Update user profile with new photo URL
+      await updateProfile({ photoURL: downloadURL });
+      
+      toast({
+        title: 'プロフィール写真を更新しました',
+        description: 'プロフィール写真が正常に更新されました。',
+      });
+    } catch (error) {
+      console.error('Error uploading profile photo:', error);
+      toast({
+        title: 'エラーが発生しました',
+        description: 'プロフィール写真のアップロード中にエラーが発生しました。',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   if (!profile) {
     return (
       <Card>
@@ -97,7 +159,54 @@ export default function UserProfileForm() {
           あなたのプロフィール情報を更新します。これらの情報はLinkedInプロフィール生成に使用されます。
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative h-32 w-32 overflow-hidden rounded-full border-2 border-muted bg-muted">
+            {profile?.photoURL ? (
+              <Image 
+                src={profile.photoURL} 
+                alt={profile.displayName} 
+                fill 
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+            )}
+            {uploadingPhoto && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-white"></div>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col items-center space-y-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm"
+              onClick={triggerFileInput}
+              disabled={uploadingPhoto}
+            >
+              {uploadingPhoto ? 'アップロード中...' : 'プロフィール写真を変更'}
+            </Button>
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              className="hidden" 
+              accept="image/*"
+              onChange={handlePhotoUpload}
+            />
+            <p className="text-xs text-muted-foreground">
+              JPG, PNG, GIF形式の画像をアップロードできます（最大5MB）
+            </p>
+          </div>
+        </div>
+      </CardContent>
+      <CardContent className="pt-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
