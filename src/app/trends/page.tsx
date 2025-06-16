@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, Search, ExternalLink, Lightbulb, ListChecks, MessageSquarePlus } from 'lucide-react';
+import { Search, ExternalLink, Lightbulb, ListChecks, MessageSquarePlus, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { generateTrendingTopics, type TrendWatcherInput, type TrendWatcherOutput, type TrendAnalysis } from '@/ai/flows/trend-watcher-flow';
@@ -73,7 +74,15 @@ export default function TrendWatcherPage() {
         <Card className="shadow-xl">
           <CardHeader className="bg-muted/30 p-6">
             <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="h-8 w-8 text-primary" />
+              <div className="relative h-10 w-10 overflow-hidden rounded-md">
+                <Image 
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=400&fit=crop&crop=faces&auto=format&q=80" 
+                  alt="Trend Watcher" 
+                  width={40} 
+                  height={40} 
+                  className="object-cover"
+                />
+              </div>
               <CardTitle className="text-2xl font-headline">AI トレンドアナリスト</CardTitle>
             </div>
             <CardDescription className="text-md">
