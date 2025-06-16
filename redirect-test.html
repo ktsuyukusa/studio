@@ -92,9 +92,9 @@
             <p><strong>Step 2:</strong> Select a path to test:</p>
             <button onclick="testRedirect('/')" class="button">Home Page</button>
             <button onclick="testRedirect('/auth')" class="button outline">Auth Page</button>
-            <button onclick="testRedirect('/examples')" class="button outline">Examples Page</button>
-            <button onclick="testRedirect('/examples/analytics')" class="button outline">Analytics Example</button>
-            <button onclick="testRedirect('/examples/images')" class="button outline">Images Example</button>
+            <button onclick="testRedirect('/profile')" class="button outline">Profile Page</button>
+            <button onclick="testRedirect('/posts')" class="button outline">Posts Page</button>
+            <button onclick="testRedirect('/comments')" class="button outline">Comments Page</button>
         </div>
         
         <div id="result" style="display: none;"></div>
@@ -128,9 +128,9 @@
                 
                 Expected behavior:
                 - /auth should show the login page
-                - /examples should show the examples overview
-                - /examples/analytics should show the analytics example
-                - /examples/images should show the images example
+                - /profile should show the profile creation page
+                - /posts should show the post creation page
+                - /comments should show the comments page
                 
                 If you see content from one page on another page (e.g., analytics content on the login page),
                 try clearing your browser cache and cookies, then try again.

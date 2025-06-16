@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Globalink CEO - Examples Direct Access</title>
+    <title>Globalink CEO - Authentication</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -71,28 +71,27 @@
     </style>
 </head>
 <body>
-    <h1>Globalink CEO - Examples Direct Access</h1>
+    <h1>Globalink CEO - Authentication</h1>
     
     <div class="card">
-        <h2>Examples Section</h2>
-        <p>Access the examples section directly using the links below. These links will take you directly to the examples pages on your Vercel deployment.</p>
+        <h2>Access Globalink CEO</h2>
+        <p>Enter your Vercel deployment URL to access the Globalink CEO application.</p>
         
         <div class="button-container">
             <p><strong>Step 1:</strong> Enter your Vercel deployment URL:</p>
             <input type="text" id="baseUrl" placeholder="e.g., https://your-project.vercel.app" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #d1d5db; border-radius: 4px;">
             
-            <button onclick="openExamples('/')" class="button">Examples Overview</button>
-            <button onclick="openExamples('/images')" class="button outline">Images Example</button>
-            <button onclick="openExamples('/analytics')" class="button outline">Analytics Example</button>
+            <button onclick="openApp('/')" class="button">Go to Home Page</button>
+            <button onclick="openApp('/auth')" class="button outline">Go to Authentication Page</button>
         </div>
     </div>
     
     <div class="note">
-        <strong>Note:</strong> If you're still having issues accessing the examples through the Vercel deployment, you may need to wait a few minutes for the deployment to complete. If the issue persists, you'll need to fix the Firebase authentication issue by following the instructions in the FIREBASE_AUTH_ISSUE.md file.
+        <strong>Note:</strong> If you're having issues with authentication, you may need to fix the Firebase authentication issue by following the instructions in the FIREBASE_AUTH_ISSUE.md file.
     </div>
 
     <script>
-        function openExamples(path) {
+        function openApp(path) {
             const baseUrl = document.getElementById('baseUrl').value.trim();
             if (!baseUrl) {
                 alert('Please enter your Vercel deployment URL first');
@@ -103,7 +102,7 @@
             const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
             
             // Construct the full URL
-            const fullUrl = `${cleanBaseUrl}/examples${path}`;
+            const fullUrl = `${cleanBaseUrl}${path}`;
             
             // Open in a new tab
             window.open(fullUrl, '_blank');

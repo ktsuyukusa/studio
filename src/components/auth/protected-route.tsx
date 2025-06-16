@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const pathname = usePathname();
 
   // List of public paths that don't require authentication
-  const publicPaths = ['/auth', '/examples', '/examples/images', '/examples/analytics'];
+  const publicPaths = ['/auth'];
   const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
 
   useEffect(() => {
